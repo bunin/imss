@@ -5,7 +5,7 @@ import (
 	"os"
 	"os/signal"
 
-	"github.com/bunin/s3-pics/app"
+	"github.com/bunin/imss/app"
 	"github.com/caarlos0/env/v6"
 	"github.com/joho/godotenv"
 )
