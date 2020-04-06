@@ -124,3 +124,5 @@ $RECYCLE.BIN/
 
 .idea/
 .env
+imss.db
+imss.log

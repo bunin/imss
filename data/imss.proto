@@ -1,0 +1,56 @@
+syntax = "proto3";
+package imss;
+
+option go_package = "github.com/bunin/imss/data";
+
+import "google/protobuf/timestamp.proto";
+
+message Session {
+    string id = 1; // Session ID
+    bool completed = 2; // Completion marker, only one active session at a time is allowed
+    google.protobuf.Timestamp createdAt = 3; // Creation time
+    google.protobuf.Timestamp finishedAt = 4; // Completion time
+    string name = 5; // Session name/title
+    repeated Image images = 6; // List of related images
+}
+
+message Image {
+    string id = 1; // Image ID
+    string sessionId = 2; // Corresponding session ID
+    string localPath = 3; // Path to image file on the workstation
+    string cloudId = 4; // Remote path/ID of uploaded image
+    google.protobuf.Timestamp createdAt = 5; // Creation time
+    uint64 size = 6; // File size in bytes
+}
+
+message ImageUpload {
+    string id = 1; // Image upload ID
+    string jobId = 2; // Related upload job ID
+    string imageId = 3; // ID of the image being uploaded
+    uint64 progress = 4; // Uploaded bytes
+    UploadStatus status = 5; // Upload status
+    Error error = 6; // Error message, if any
+}
+
+message UploadJob {
+    string id = 1; // Job ID
+    repeated string imageIds = 2; // Related image IDs
+    UploadStatus status = 3; // Upload status
+    google.protobuf.Timestamp createdAt = 4; // Start time
+    google.protobuf.Timestamp finishedAt = 5; // End time
+    uint64 progress = 6; // Uploaded bytes
+    uint64 size = 7; // Total amount of bytes to upload
+    string recipient = 8; // User's email or other contact info
+}
+
+message Error {
+    uint64 code = 1; // Error code
+    string message = 2; // Error message
+}
+
+enum UploadStatus {
+    UNKNOWN = 0;
+    IN_PROGRESS = 1;
+    DONE = 2;
+    ERROR = 3;
+}

@@ -1,5 +1,7 @@
 # IMSS
 
+[PRD](https://github.com/verevskoy/imss-notes/blob/master/SPECIFICATION.md) | [data types](./types.md)
+
 Env parameters (see [.env.example](.env.example)):
 
 |Name|Description|
