@@ -42,7 +42,9 @@
 </style>
 
 <main>
-  {#if authorized}
+  {#if authorized === null}
+    Loading...
+  {:else if authorized}
     <Router {url}>
       <nav>
         <Link to="/">Home</Link>
