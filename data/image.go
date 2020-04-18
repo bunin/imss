@@ -39,11 +39,11 @@ func (m *Image) saveToDB() error {
 	}), "failed to save image")
 }
 
-func loadImageByPath(sceneID, path string) (*Image, error) {
+func loadImageByPath(sessionID, path string) (*Image, error) {
 	var result *Image
 	if err := db.Get().View(func(tx *bbolt.Tx) error {
 		c := tx.Bucket([]byte(db.BucketImages)).Cursor()
-		prefix := []byte(sceneID + ":")
+		prefix := []byte(sessionID + ":")
 		img := &Image{}
 		for k, v := c.Seek(prefix); k != nil && bytes.HasPrefix(k, prefix); k, v = c.Next() {
 			if err := proto.Unmarshal(v, img); err != nil {

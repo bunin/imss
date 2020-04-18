@@ -77,10 +77,10 @@ func (a *app) startServer() error {
 	{
 		api.GET("/test", handlers.Test)
 		api.GET("/auth/check", handlers.CheckAuth(a.cfg.ClientID, a.cfg.Secret))
-		api.GET("/session", handlers.ListScenes)
-		api.GET("/session/:id", handlers.GetScene)
-		api.PATCH("/session/:id", handlers.UpdateScene)
-		api.POST("/session", handlers.CreateScene)
+		api.GET("/session", handlers.ListSessions)
+		api.GET("/session/:id", handlers.GetSession)
+		api.PATCH("/session/:id", handlers.UpdateSession)
+		api.POST("/session", handlers.CreateSession)
 		api.POST("/upload", handlers.Upload)
 	}
 

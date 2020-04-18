@@ -1,7 +1,7 @@
 <script>
   import { onDestroy } from 'svelte';
 
-  export let sessionId = '';
+  export const sessionId = '';
 
   let photos = [];
 
@@ -15,7 +15,7 @@
       const sse = new EventSource('/api/sse');
       sse.addEventListener('message', ({ data }) => {
         if (data.photo) {
-          photos.push(photo);
+          photos.unshift(photo);
         }
       });
       sse.addEventListener('error', err => console.error(err));

@@ -91,7 +91,7 @@
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | id | [string](#string) |  | Session ID |
-| completed | [bool](#bool) |  | Completion marker, only one active session at a time is allowed |
+| active | [bool](#bool) |  | Only one active session at a time is allowed |
 | createdAt | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | Creation time |
 | finishedAt | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | Completion time |
 | name | [string](#string) |  | Session name/title |
@@ -117,7 +117,7 @@
 | finishedAt | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | End time |
 | progress | [uint64](#uint64) |  | Uploaded bytes |
 | size | [uint64](#uint64) |  | Total amount of bytes to upload |
-| recipient | [string](#string) |  | User&#39;s email or other contact |
+| recipient | [string](#string) |  | User&#39;s email or other contact info |
 
 
 

@@ -19,8 +19,8 @@ var (
 
 func GetActiveSession() *Session {
 	asOnce.Do(func() {
-		if err := LoadActiveScene(); err != nil {
-			zap.L().Error("failed to load active scene from db", zap.Error(err))
+		if err := LoadActiveSession(); err != nil {
+			zap.L().Error("failed to load active session from db", zap.Error(err))
 		}
 	})
 	asLock.RLock()
@@ -34,14 +34,14 @@ func SetActiveSession(s *Session) {
 	asLock.Unlock()
 }
 
-func LoadActiveScene() error {
+func LoadActiveSession() error {
 	return db.Get().View(func(tx *bbolt.Tx) error {
 		return tx.Bucket([]byte(db.BucketSessions)).ForEach(func(k, v []byte) error {
 			s := &Session{}
 			if err := proto.Unmarshal(v, s); err != nil {
 				return err
 			}
-			if !s.Completed {
+			if s.Active {
 				SetActiveSession(s)
 				return nil
 			}

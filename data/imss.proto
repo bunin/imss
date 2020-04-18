@@ -7,7 +7,7 @@ import "google/protobuf/timestamp.proto";
 
 message Session {
     string id = 1; // Session ID
-    bool completed = 2; // Completion marker, only one active session at a time is allowed
+    bool active = 2; // Only one active session at a time is allowed
     google.protobuf.Timestamp createdAt = 3; // Creation time
     google.protobuf.Timestamp finishedAt = 4; // Completion time
     string name = 5; // Session name/title

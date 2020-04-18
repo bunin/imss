@@ -28,11 +28,11 @@ func Test(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, res)
 }
 
-func loadImagesByScene(sceneID string) ([]*data.Image, error) {
+func loadImagesBySession(sessionID string) ([]*data.Image, error) {
 	images := make([]*data.Image, 0, 16)
 	if err := db.Get().View(func(tx *bbolt.Tx) error {
 		imagesCursor := tx.Bucket([]byte(db.BucketImages)).Cursor()
-		prefix := []byte(sceneID)
+		prefix := []byte(sessionID)
 		for ik, iv := imagesCursor.Seek(prefix); ik != nil && bytes.HasPrefix(ik, prefix); ik, iv = imagesCursor.Next() {
 			i := &data.Image{}
 			if err := proto.Unmarshal(iv, i); err != nil {

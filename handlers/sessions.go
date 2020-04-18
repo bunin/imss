@@ -14,8 +14,16 @@ import (
 	"go.etcd.io/bbolt"
 )
 
-func ListScenes(ctx *gin.Context) {
-	result := make([]*data.Session, 0, 20)
+type listSessionsResponse struct {
+	ActiveSession *data.Session   `json:"activeSession"`
+	Sessions      []*data.Session `json:"scenes"`
+}
+
+func ListSessions(ctx *gin.Context) {
+	result := &listSessionsResponse{
+		ActiveSession: data.GetActiveSession(),
+		Sessions:      make([]*data.Session, 0, 20),
+	}
 	if err := db.Get().View(func(tx *bbolt.Tx) error {
 		c := tx.Bucket([]byte(db.BucketSessions)).Cursor()
 		i := 0
@@ -28,12 +36,12 @@ func ListScenes(ctx *gin.Context) {
 			if err := proto.Unmarshal(v, s); err != nil {
 				return err
 			}
-			images, err := loadImagesByScene(s.Id)
+			images, err := loadImagesBySession(s.Id)
 			if err != nil {
 				return err
 			}
 			s.Images = images
-			result = append(result, s)
+			result.Sessions = append(result.Sessions, s)
 		}
 		return nil
 	}); err != nil {
@@ -44,9 +52,9 @@ func ListScenes(ctx *gin.Context) {
 	return
 }
 
-func GetScene(ctx *gin.Context) {
-	sceneID := ctx.Param("id")
-	scene, err := loadScene(sceneID, true)
+func GetSession(ctx *gin.Context) {
+	sessionID := ctx.Param("id")
+	session, err := loadSession(sessionID, true)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			ctx.Status(http.StatusNotFound)
@@ -56,38 +64,38 @@ func GetScene(ctx *gin.Context) {
 			return
 		}
 	}
-	ctx.JSON(http.StatusOK, scene)
+	ctx.JSON(http.StatusOK, session)
 }
 
-func CreateScene(ctx *gin.Context) {
+func CreateSession(ctx *gin.Context) {
 	if s := data.GetActiveSession(); s != nil {
-		ctx.Status(http.StatusFound)
-		ctx.Header("Location", "/scene/"+s.Id)
+		ctx.Header("Location", "/photos/"+s.Id)
+		ctx.JSON(http.StatusMultiStatus, map[string]string{"url": "/photos/" + s.Id})
 		return
 	}
-	scene := &data.Session{
+	session := &data.Session{
 		Id:        xid.New().String(),
-		Completed: false,
+		Active:    true,
 		CreatedAt: ptypes.TimestampNow(),
 	}
 	if err := db.Get().Update(func(tx *bbolt.Tx) error {
-		b, err := proto.Marshal(scene)
+		b, err := proto.Marshal(session)
 		if err != nil {
 			return err
 		}
-		return tx.Bucket([]byte(db.BucketSessions)).Put([]byte(scene.Id), b)
+		return tx.Bucket([]byte(db.BucketSessions)).Put([]byte(session.Id), b)
 	}); err != nil {
-		ctx.JSON(http.StatusInternalServerError, err)
+		ctx.JSON(http.StatusInternalServerError, map[string]error{"error": err})
 		return
 	}
-	data.SetActiveSession(scene)
-	ctx.Header("Location", "/scene/"+scene.Id)
-	ctx.JSON(http.StatusCreated, scene)
+	data.SetActiveSession(session)
+	ctx.Header("Location", "/photos/"+session.Id)
+	ctx.JSON(http.StatusCreated, session)
 }
 
-func UpdateScene(ctx *gin.Context) {
-	sceneID := ctx.Param("id")
-	sceneToUpdate, err := loadScene(sceneID, false)
+func UpdateSession(ctx *gin.Context) {
+	sessionID := ctx.Param("id")
+	sessionToUpdate, err := loadSession(sessionID, false)
 	newData := &data.Session{}
 	if err := ctx.BindJSON(newData); err != nil {
 		ctx.Status(http.StatusBadRequest)
@@ -102,26 +110,26 @@ func UpdateScene(ctx *gin.Context) {
 			return
 		}
 	}
-	currentScene := data.GetActiveSession()
-	if !newData.Completed && currentScene != nil && currentScene.Id != sceneID && !currentScene.Completed {
-		ctx.Header("Location", "/scene/"+currentScene.Id)
+	currentSession := data.GetActiveSession()
+	if newData.Active && currentSession != nil && currentSession.Id != sessionID && currentSession.Active {
+		ctx.Header("Location", "/session/"+currentSession.Id)
 		ctx.Status(http.StatusFound)
 		return
 	}
-	sceneToUpdate.Completed = newData.Completed
-	if !newData.Completed {
-		data.SetActiveSession(sceneToUpdate)
+	sessionToUpdate.Active = newData.Active
+	if newData.Active {
+		data.SetActiveSession(sessionToUpdate)
 	} else {
-		sceneToUpdate.FinishedAt = ptypes.TimestampNow()
+		sessionToUpdate.FinishedAt = ptypes.TimestampNow()
 		data.SetActiveSession(nil)
 	}
-	if err := sceneToUpdate.Save(); err != nil {
+	if err := sessionToUpdate.Save(); err != nil {
 		ctx.JSON(http.StatusInternalServerError, err)
 		return
 	}
 }
 
-func loadScene(id string, withImages bool) (*data.Session, error) {
+func loadSession(id string, withImages bool) (*data.Session, error) {
 	s := &data.Session{}
 	if err := db.Get().View(func(tx *bbolt.Tx) error {
 		d := tx.Bucket([]byte(db.BucketSessions)).Get([]byte(id))
@@ -132,7 +140,7 @@ func loadScene(id string, withImages bool) (*data.Session, error) {
 			return err
 		}
 		if withImages {
-			images, err := loadImagesByScene(id)
+			images, err := loadImagesBySession(id)
 			if err != nil {
 				return err
 			}
@@ -140,7 +148,7 @@ func loadScene(id string, withImages bool) (*data.Session, error) {
 		}
 		return nil
 	}); err != nil {
-		return nil, errors.Wrap(err, "failed to load scene")
+		return nil, errors.Wrap(err, "failed to load session")
 	}
 	return s, nil
 }
