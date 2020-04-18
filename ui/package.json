@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "bulma": "^0.8.2",
-    "sirv-cli": "^0.4.4"
+    "sirv-cli": "^0.4.4",
+    "svelte-routing": "^1.4.2"
   }
 }

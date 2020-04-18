@@ -1,44 +1,56 @@
 <script>
-    import Scenes from './scenes.svelte'
+  import { Router, Route, Link } from 'svelte-routing';
+  import Home from './components/Home.svelte';
+  import Photos from './components/Photos.svelte';
 
-    let comp;
+  export let url = '';
+
+  /**
+   * @name authorized
+   * @description Defines if the user is authorized
+   */
+  let authorized = false;
+
+  (async () => {
     try {
-        (async () => {
-            const auth = await fetch("/api/auth/check");
-            const resp = await auth.json();
-            if (resp.hasOwnProperty("url") && resp.url !== "") {
-                location.assign(resp.url)
-            } else {
-                comp = Scenes
-            }
-        })()
-    } catch (e) {
-        console.error(e)
+      const resp = await fetch('/api/auth/check');
+      const body = await resp.json();
+      if (body.url) {
+        location.assign(body.url);
+      } else {
+        authorized = true;
+      }
+    } catch (err) {
+      console.error(err);
     }
+  })();
 </script>
 
-<main>
-    <svelte:component this={comp}/>
-</main>
-
 <style>
+  main {
+    text-align: center;
+    padding: 1em;
+    max-width: 240px;
+    margin: 0 auto;
+  }
+
+  @media (min-width: 640px) {
     main {
-        text-align: center;
-        padding: 1em;
-        max-width: 240px;
-        margin: 0 auto;
+      max-width: none;
     }
-
-    h1 {
-        color: #ff3e00;
-        text-transform: uppercase;
-        font-size: 4em;
-        font-weight: 100;
-    }
-
-    @media (min-width: 640px) {
-        main {
-            max-width: none;
-        }
-    }
+  }
 </style>
+
+<main>
+  {#if authorized}
+    <Router {url}>
+      <nav>
+        <Link to="/">Home</Link>
+      </nav>
+      <div>
+        <Route path="/" component={Home} />
+        <Route path="/photos/:sessionId" component={Photos} />
+      </div>
+    </Router>
+  {:else}Unauthorized. Redirecting to authentication page.{/if}
+</main>
