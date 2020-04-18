@@ -9,7 +9,7 @@
    * @name authorized
    * @description Defines if the user is authorized
    */
-  let authorized = false;
+  let authorized = null;
 
   (async () => {
     try {
