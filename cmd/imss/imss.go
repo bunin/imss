@@ -12,8 +12,8 @@ import (
 
 func main() {
 	_ = godotenv.Load()
-	cfg := app.Config{}
-	if err := env.Parse(&cfg); err != nil {
+	cfg := &app.Config{}
+	if err := env.Parse(cfg); err != nil {
 		log.Fatalln("failed to parse env", err)
 	}
 	if err := cfg.Validate(); err != nil {

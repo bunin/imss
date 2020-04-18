@@ -4,14 +4,12 @@ import (
 	"context"
 	"log"
 	"net/http"
-	"os"
 	"strconv"
 	"time"
 
-	"github.com/bunin/imss/data"
 	"github.com/bunin/imss/db"
 	"github.com/bunin/imss/handlers"
-	"github.com/fsnotify/fsnotify"
+	"github.com/bunin/imss/ui"
 	ginzap "github.com/gin-contrib/zap"
 	"github.com/gin-gonic/gin"
 	"github.com/hashicorp/go-multierror"
@@ -20,12 +18,11 @@ import (
 )
 
 type app struct {
-	cfg Config
-	w   *fsnotify.Watcher
+	cfg *Config
 	srv *http.Server
 }
 
-func New(cfg Config) *app {
+func New(cfg *Config) *app {
 	return &app{cfg: cfg}
 }
 
@@ -41,27 +38,14 @@ func (a *app) Run() error {
 	if err = db.Init(a.cfg.DB); err != nil {
 		return err
 	}
-	if a.w, err = fsnotify.NewWatcher(); err != nil {
-		return errors.Wrap(err, "failed to create a file watcher")
-	}
-	if err = a.w.Add(a.cfg.Dir); err != nil {
-		return errors.Wrap(err, "failed to watch "+a.cfg.Dir+" dir")
-	}
-
 	if err = a.startServer(); err != nil {
 		return errors.Wrap(err, "failed to start a server")
 	}
-
-	a.watch()
-
 	return nil // todo
 }
 
 func (a *app) Stop() error {
 	var e error
-	if err := a.w.Close(); err != nil {
-		e = multierror.Append(e, errors.Wrap(err, "failed to close file watcher"))
-	}
 	if err := db.Close(); err != nil {
 		e = multierror.Append(e, errors.Wrap(err, "failed to close database"))
 	}
@@ -71,47 +55,6 @@ func (a *app) Stop() error {
 		e = multierror.Append(e, errors.Wrap(err, "failed to stop http server"))
 	}
 	return e
-}
-
-func (a *app) watch() {
-	logger := zap.L()
-	for {
-		select {
-		case err := <-a.w.Errors:
-			{
-				if err != nil {
-					logger.Error("watch error", zap.Error(err))
-					return
-				}
-			}
-		case event, more := <-a.w.Events:
-			if !more {
-				logger.Info("watcher closed")
-				return
-			}
-			switch event.Op.String() {
-			case "WRITE":
-				f, err := os.Stat(event.Name)
-				if err != nil {
-					log.Println("failed to open file", err)
-					continue
-				}
-				if f.IsDir() {
-					logger.Info(event.Name + " is a directory, skipping")
-					continue
-				}
-				scene := data.GetActiveSession()
-				img := &data.Image{
-					SessionId: scene.Id,
-					LocalPath: event.Name,
-					Size:      uint64(f.Size()),
-				}
-				if err := img.Save(); err != nil {
-					logger.Error("failed to save local image", zap.Error(err))
-				}
-			}
-		}
-	}
 }
 
 func (a *app) loggerConfig() zap.Config {
@@ -128,12 +71,18 @@ func (a *app) loggerConfig() zap.Config {
 func (a *app) startServer() error {
 	r := gin.New()
 	r.Use(ginzap.Ginzap(zap.L(), time.RFC3339, false), ginzap.RecoveryWithZap(zap.L(), true))
-
-	r.GET("/session", handlers.ListScenes)
-	r.GET("/session/:id", handlers.GetScene)
-	r.PATCH("/session/:id", handlers.UpdateScene)
-	r.POST("/session", handlers.CreateScene)
-	r.POST("/upload", handlers.Upload)
+	r.NoRoute(ui.Handle)
+	r.GET("/auth", handlers.Auth)
+	api := r.Group("/api")
+	{
+		api.GET("/test", handlers.Test)
+		api.GET("/auth/check", handlers.CheckAuth(a.cfg.ClientID, a.cfg.Secret))
+		api.GET("/session", handlers.ListScenes)
+		api.GET("/session/:id", handlers.GetScene)
+		api.PATCH("/session/:id", handlers.UpdateScene)
+		api.POST("/session", handlers.CreateScene)
+		api.POST("/upload", handlers.Upload)
+	}
 
 	a.srv = &http.Server{Addr: ":" + strconv.FormatUint(a.cfg.Port, 10), Handler: r}
 

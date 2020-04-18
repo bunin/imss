@@ -13,6 +13,7 @@ const (
 	BucketImages       = `images`
 	BucketImageUploads = `images-up`
 	BucketUploads      = `uploads`
+	BucketMisc         = `misc`
 )
 
 var (
@@ -23,6 +24,7 @@ var (
 		[]byte(BucketImages),
 		[]byte(BucketImageUploads),
 		[]byte(BucketUploads),
+		[]byte(BucketMisc),
 	}
 )
 
