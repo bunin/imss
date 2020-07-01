@@ -2,7 +2,7 @@
 
 [PRD](https://github.com/verevskoy/imss-notes/blob/master/SPECIFICATION.md) | [data types](./types.md) | [API](./API.md)
 
-This software requires [Android Debug Bridge (adb)](https://developer.android.com/studio/command-line/adb) and accessible from `%PATH%`.
+This software requires [Android Debug Bridge (adb)](https://developer.android.com/studio/command-line/adb) installed and accessible from `%PATH%`.
 Also, a Google OAuth 2.0 app with access to these scopes `https://www.googleapis.com/auth/photoslibrary`, `https://www.googleapis.com/auth/photoslibrary.sharing` and `http://localhost:8080/auth` as an allowed redirect URL.
 
 Configuration (see [.env.example](.env.example)):
