@@ -67,11 +67,16 @@ func CreateSession(ctx *gin.Context) {
 		ctx.Header("Location", "/api/session/"+s.Id)
 		return
 	}
-	session := &data.Session{
-		Id:        xid.New().String(),
-		IsActive:  true,
-		CreatedAt: ptypes.TimestampNow(),
+	session := &data.Session{}
+	if err := ctx.BindJSON(session); err != nil {
+		ctx.JSON(http.StatusBadRequest, err)
+		return
 	}
+	session.Id = xid.New().String()
+	session.IsActive = true
+	session.CreatedAt = ptypes.TimestampNow()
+	session.Images = nil
+
 	if err := session.Save(); err != nil {
 		ctx.JSON(http.StatusInternalServerError, err)
 		return
