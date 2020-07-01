@@ -9,12 +9,13 @@ import (
 	"github.com/pkg/errors"
 	"github.com/rs/xid"
 	"go.etcd.io/bbolt"
+	"go.uber.org/zap"
 )
 
 func (m *Image) Save() error {
 	img, err := loadImageByPath(m.SessionId, m.LocalPath)
 	if err != nil {
-		return errors.Wrap(err, "failed to load image")
+		return errors.Wrap(err, "loading image")
 	}
 	if img == nil { // new image
 		img = m
@@ -33,10 +34,10 @@ func (m *Image) saveToDB() error {
 	return errors.Wrap(db.Get().Update(func(tx *bbolt.Tx) error {
 		d, err := proto.Marshal(m)
 		if err != nil {
-			return errors.Wrap(err, "failed to marshal image")
+			return errors.Wrap(err, "marshal image")
 		}
-		return errors.Wrap(tx.Bucket([]byte(db.BucketImages)).Put([]byte(m.Id), d), "failed to put image")
-	}), "failed to save image")
+		return errors.Wrap(tx.Bucket([]byte(db.BucketImages)).Put([]byte(m.Id), d), "put image")
+	}), "save image")
 }
 
 func loadImageByPath(sessionID, path string) (*Image, error) {
@@ -47,7 +48,7 @@ func loadImageByPath(sessionID, path string) (*Image, error) {
 		img := &Image{}
 		for k, v := c.Seek(prefix); k != nil && bytes.HasPrefix(k, prefix); k, v = c.Next() {
 			if err := proto.Unmarshal(v, img); err != nil {
-				return errors.Wrap(err, "failed to unmarshal image")
+				return errors.Wrap(err, "unmarshal image")
 			}
 			if img.LocalPath != path {
 				continue
@@ -57,7 +58,24 @@ func loadImageByPath(sessionID, path string) (*Image, error) {
 		}
 		return nil
 	}); err != nil {
-		return nil, errors.Wrap(err, "failed to load image")
+		return nil, errors.Wrap(err, "load image")
 	}
 	return result, nil
+}
+
+func ImageByID(id string) *Image {
+	l := zap.L()
+	var img *Image
+	if err := db.Get().View(func(tx *bbolt.Tx) error {
+		d := tx.Bucket([]byte(db.BucketImages)).Get([]byte(id))
+		t := &Image{}
+		if err := proto.Unmarshal(d, t); err != nil {
+			return err
+		}
+		img = t
+		return nil
+	}); err != nil {
+		l.Error("ImageByID", zap.Error(err))
+	}
+	return img
 }

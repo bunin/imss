@@ -14,7 +14,7 @@ func main() {
 	_ = godotenv.Load()
 	cfg := &app.Config{}
 	if err := env.Parse(cfg); err != nil {
-		log.Fatalln("failed to parse env", err)
+		log.Fatalln("parsing env", err)
 	}
 	if err := cfg.Validate(); err != nil {
 		log.Fatalln("invalid env", err)
@@ -22,7 +22,7 @@ func main() {
 	a := app.New(cfg)
 	go func() {
 		if err := a.Run(); err != nil {
-			log.Fatalln("failed to start app", err)
+			log.Fatalln("starting app", err)
 		}
 	}()
 
@@ -31,7 +31,7 @@ func main() {
 	for s := range c {
 		log.Println("got signal " + s.String() + ". stopping.")
 		if err := a.Stop(); err != nil {
-			log.Fatalln("failed to stop the app", err)
+			log.Fatalln("stopping the app", err)
 		}
 		os.Exit(0)
 	}

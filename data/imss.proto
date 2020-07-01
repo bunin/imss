@@ -7,11 +7,11 @@ import "google/protobuf/timestamp.proto";
 
 message Session {
     string id = 1; // Session ID
-    bool active = 2; // Only one active session at a time is allowed
+    bool isActive = 2; // Completion marker, only one active session at a time is allowed
     google.protobuf.Timestamp createdAt = 3; // Creation time
     google.protobuf.Timestamp finishedAt = 4; // Completion time
     string name = 5; // Session name/title
-    repeated Image images = 6; // List of related images
+    repeated Image images = 6; // List of related images (output only)
 }
 
 message Image {
@@ -28,19 +28,23 @@ message ImageUpload {
     string jobId = 2; // Related upload job ID
     string imageId = 3; // ID of the image being uploaded
     uint64 progress = 4; // Uploaded bytes
-    UploadStatus status = 5; // Upload status
-    Error error = 6; // Error message, if any
+    string cloudId = 5; // Image ID in the cloud
+    UploadStatus status = 6; // Upload status
+    Error error = 7; // Error message, if any
 }
 
 message UploadJob {
     string id = 1; // Job ID
-    repeated string imageIds = 2; // Related image IDs
-    UploadStatus status = 3; // Upload status
-    google.protobuf.Timestamp createdAt = 4; // Start time
-    google.protobuf.Timestamp finishedAt = 5; // End time
-    uint64 progress = 6; // Uploaded bytes
-    uint64 size = 7; // Total amount of bytes to upload
-    string recipient = 8; // User's email or other contact info
+    UploadStatus status = 2; // Upload status
+    google.protobuf.Timestamp createdAt = 3; // Start time
+    google.protobuf.Timestamp finishedAt = 4; // End time
+    uint64 progress = 5; // Uploaded bytes
+    uint64 size = 6; // Total amount of bytes to upload
+    string recipient = 7; // User's email or other contact info
+    repeated ImageUpload images = 8; // Images upload data
+    string CloudLink = 9; // Link to share with a recipient
+    Error error = 10; // Error message, if any
+    string Name = 11; // Album name (optional)
 }
 
 message Error {

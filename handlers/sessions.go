@@ -6,24 +6,18 @@ import (
 
 	"github.com/bunin/imss/data"
 	"github.com/bunin/imss/db"
+	"github.com/bunin/imss/photos"
 	"github.com/gin-gonic/gin"
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/pkg/errors"
 	"github.com/rs/xid"
 	"go.etcd.io/bbolt"
+	"go.uber.org/zap"
 )
 
-type listSessionsResponse struct {
-	ActiveSession *data.Session   `json:"activeSession"`
-	Sessions      []*data.Session `json:"scenes"`
-}
-
 func ListSessions(ctx *gin.Context) {
-	result := &listSessionsResponse{
-		ActiveSession: data.GetActiveSession(),
-		Sessions:      make([]*data.Session, 0, 20),
-	}
+	result := make([]*data.Session, 0, 20)
 	if err := db.Get().View(func(tx *bbolt.Tx) error {
 		c := tx.Bucket([]byte(db.BucketSessions)).Cursor()
 		i := 0
@@ -41,7 +35,7 @@ func ListSessions(ctx *gin.Context) {
 				return err
 			}
 			s.Images = images
-			result.Sessions = append(result.Sessions, s)
+			result = append(result, s)
 		}
 		return nil
 	}); err != nil {
@@ -69,27 +63,21 @@ func GetSession(ctx *gin.Context) {
 
 func CreateSession(ctx *gin.Context) {
 	if s := data.GetActiveSession(); s != nil {
-		ctx.Header("Location", "/photos/"+s.Id)
-		ctx.JSON(http.StatusMultiStatus, map[string]string{"url": "/photos/" + s.Id})
+		ctx.Status(http.StatusFound)
+		ctx.Header("Location", "/api/session/"+s.Id)
 		return
 	}
 	session := &data.Session{
 		Id:        xid.New().String(),
-		Active:    true,
+		IsActive:  true,
 		CreatedAt: ptypes.TimestampNow(),
 	}
-	if err := db.Get().Update(func(tx *bbolt.Tx) error {
-		b, err := proto.Marshal(session)
-		if err != nil {
-			return err
-		}
-		return tx.Bucket([]byte(db.BucketSessions)).Put([]byte(session.Id), b)
-	}); err != nil {
-		ctx.JSON(http.StatusInternalServerError, map[string]error{"error": err})
+	if err := session.Save(); err != nil {
+		ctx.JSON(http.StatusInternalServerError, err)
 		return
 	}
 	data.SetActiveSession(session)
-	ctx.Header("Location", "/photos/"+session.Id)
+	ctx.Header("Location", "/api/session/"+session.Id)
 	ctx.JSON(http.StatusCreated, session)
 }
 
@@ -111,22 +99,26 @@ func UpdateSession(ctx *gin.Context) {
 		}
 	}
 	currentSession := data.GetActiveSession()
-	if newData.Active && currentSession != nil && currentSession.Id != sessionID && currentSession.Active {
-		ctx.Header("Location", "/session/"+currentSession.Id)
+	if newData.IsActive && currentSession != nil && currentSession.Id != sessionID && currentSession.IsActive {
+		ctx.Header("Location", "/api/session/"+currentSession.Id)
 		ctx.Status(http.StatusFound)
 		return
 	}
-	sessionToUpdate.Active = newData.Active
-	if newData.Active {
+	sessionToUpdate.IsActive = newData.IsActive
+	if newData.IsActive {
 		data.SetActiveSession(sessionToUpdate)
 	} else {
 		sessionToUpdate.FinishedAt = ptypes.TimestampNow()
+		if err := photos.Stop(); err != nil {
+			zap.L().Error("stop listening", zap.Error(err))
+		}
 		data.SetActiveSession(nil)
 	}
 	if err := sessionToUpdate.Save(); err != nil {
 		ctx.JSON(http.StatusInternalServerError, err)
 		return
 	}
+	ctx.JSON(http.StatusOK, sessionToUpdate)
 }
 
 func loadSession(id string, withImages bool) (*data.Session, error) {
@@ -148,7 +140,7 @@ func loadSession(id string, withImages bool) (*data.Session, error) {
 		}
 		return nil
 	}); err != nil {
-		return nil, errors.Wrap(err, "failed to load session")
+		return nil, errors.Wrap(err, "load session")
 	}
 	return s, nil
 }

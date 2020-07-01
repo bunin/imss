@@ -33,18 +33,18 @@ func Init(path string) error {
 	defer dbLock.Unlock()
 	var err error
 	if db, err = bbolt.Open(path, 0660, &bbolt.Options{}); err != nil {
-		return errors.Wrap(err, "failed to open database "+path)
+		return errors.Wrap(err, "open database "+path)
 	}
 	err = db.Update(func(tx *bbolt.Tx) error {
 		var result, e error
 		for _, bucketName := range bucketNames {
 			if _, e = tx.CreateBucketIfNotExists(bucketName); e != nil {
-				result = multierror.Append(result, errors.Wrap(e, "failed to create bucket "+string(bucketName)))
+				result = multierror.Append(result, errors.Wrap(e, "create bucket "+string(bucketName)))
 			}
 		}
 		return result
 	})
-	return errors.Wrap(err, "failed to init database "+path)
+	return errors.Wrap(err, "init database "+path)
 }
 
 func Get() *bbolt.DB {

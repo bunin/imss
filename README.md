@@ -1,12 +1,26 @@
 # IMSS
 
-[PRD](https://github.com/verevskoy/imss-notes/blob/master/SPECIFICATION.md) | [data types](./types.md)
+[PRD](https://github.com/verevskoy/imss-notes/blob/master/SPECIFICATION.md) | [data types](./types.md) | [API](./API.md)
 
-Env parameters (see [.env.example](.env.example)):
+This software requires [Android Debug Bridge (adb)](https://developer.android.com/studio/command-line/adb) and accessible from `%PATH%`.
+Also, a Google OAuth 2.0 app with access to these scopes `https://www.googleapis.com/auth/photoslibrary`, `https://www.googleapis.com/auth/photoslibrary.sharing`
+
+Configuration (see [.env.example](.env.example)):
 
 |Name|Description|
 |---|---|
-|`IMSS_DIR`| Directory to watch, required, default is `.` (current directory). |
-|`IMSS_KEY`| S3 Access key. Required. |
-|`IMSS_SECRET`| S3 Secret key. Required. |
-|`IMSS_BUCKET`| S3 bucket name. Required, default is `pics`. |
+|`IMSS_DB`| Local database file, default is `./imss.db`. |
+|`IMSS_GOOGLE_ID`| Google OAuth 2.0 client ID ([docs](https://developers.google.com/photos/library/guides/get-started#enable-the-api)). Required. |
+|`IMSS_GOOGLE_SECRET`|  Google OAuth 2.0 client Secret  ([docs](https://developers.google.com/photos/library/guides/get-started#enable-the-api)). Required. |
+|`LOCAL_DIR`| Where to store files locally, default is `C:\tmp`. |
+|`IMSS_LOG`| Where to writes log, `./imss.log` by default. Can be a path to a file, `stdout` or `stderr`. |
+|`IMSS_LOG_LEVEL`| Log level. `debug` by default. Available levels are: `debug`, `info`, `warn`, `error`, `dpanic`, `panic`, `fatal`. |
+|`PHONE_DIR`| Directory to scan for a new files on the phone. `/sdcard/DCIM/Camera/` by default. |
+|`IMSS_PORT`| Port to listen on. `8080` by default. |
+|`SMTP_FROM_EMAIL`| |
+|`SMTP_FROM_NAME`| |
+|`SMTP_HOST`| `smtp.gmail.com` by default. |
+|`SMTP_LOGIN`| |
+|`SMTP_PASSWORD`| |
+|`SMTP_PORT`| `587` by default. |
+

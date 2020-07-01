@@ -1,0 +1,6 @@
+Message prints a page implementing Message interface.
+
+{% func Text(name string, link string) %}
+Hi there,
+There is your {%s name %}: {%s link %}
+{% endfunc %}
