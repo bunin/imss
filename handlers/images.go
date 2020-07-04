@@ -22,7 +22,7 @@ func loadImagesBySession(sessionID string) ([]*data.Image, error) {
 			if err := proto.Unmarshal(iv, i); err != nil {
 				return err
 			}
-			i.LocalPath = url.PathEscape(i.LocalPath)
+			i.LocalPath = "/files/" + url.PathEscape(i.LocalPath)
 			images = append(images, i)
 		}
 		return nil

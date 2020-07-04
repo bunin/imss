@@ -44,7 +44,7 @@ Response example:
             {
                 "id": "brqr7ipjpb3jqs7hnbcg:brs5fj1jpb3jmu66lc30",
                 "sessionId": "brqr7ipjpb3jqs7hnbcg",
-                "localPath": "C:%5C%20tmp%5CIMG_20200628_154144.jpg",
+                "localPath": "/files/C:%5C%20tmp%5CIMG_20200628_154144.jpg",
                 "createdAt": {
                     "seconds": 1593333708,
                     "nanos": 600069300
@@ -54,7 +54,7 @@ Response example:
             {
                 "id": "brqr7ipjpb3jqs7hnbcg:brs5ge1jpb3jmu66lc40",
                 "sessionId": "brqr7ipjpb3jqs7hnbcg",
-                "localPath": "C:%5C%20tmp%5CIMG_20200628_154332.jpg",
+                "localPath": "/files/C:%5C%20tmp%5CIMG_20200628_154332.jpg",
                 "createdAt": {
                     "seconds": 1593333816,
                     "nanos": 669570500
@@ -64,7 +64,7 @@ Response example:
             {
                 "id": "brqr7ipjpb3jqs7hnbcg:brs5vrpjpb3gne1rbm0g",
                 "sessionId": "brqr7ipjpb3jqs7hnbcg",
-                "localPath": "C:%5Ctmp%5CIMG_20200628_161627.jpg",
+                "localPath": "/files/C:%5Ctmp%5CIMG_20200628_161627.jpg",
                 "createdAt": {
                     "seconds": 1593335791,
                     "nanos": 825199500
@@ -74,7 +74,7 @@ Response example:
             {
                 "id": "brqr7ipjpb3jqs7hnbcg:brs5vshjpb3gne1rbm1g",
                 "sessionId": "brqr7ipjpb3jqs7hnbcg",
-                "localPath": "C:%5Ctmp%5CVID_20200628_161633.mp4",
+                "localPath": "/files/C:%5Ctmp%5CVID_20200628_161633.mp4",
                 "createdAt": {
                     "seconds": 1593335794,
                     "nanos": 677720800
@@ -83,7 +83,7 @@ Response example:
             {
                 "id": "brqr7ipjpb3jqs7hnbcg:brs5vtpjpb3gne1rbm2g",
                 "sessionId": "brqr7ipjpb3jqs7hnbcg",
-                "localPath": "C:%5Ctmp%5CVID_20200628_161637.mp4",
+                "localPath": "/files/C:%5Ctmp%5CVID_20200628_161637.mp4",
                 "createdAt": {
                     "seconds": 1593335799,
                     "nanos": 874471000
@@ -93,7 +93,7 @@ Response example:
             {
                 "id": "brqr7ipjpb3jqs7hnbcg:brs75bhjpb3gbh0tfrbg",
                 "sessionId": "brqr7ipjpb3jqs7hnbcg",
-                "localPath": "C:%5Ctmp%5CIMG_20200628_173622.jpg",
+                "localPath": "/files/C:%5Ctmp%5CIMG_20200628_173622.jpg",
                 "createdAt": {
                     "seconds": 1593340590,
                     "nanos": 291296300
@@ -127,7 +127,7 @@ Response example:
         {
             "id": "brqr7ipjpb3jqs7hnbcg:brs5fj1jpb3jmu66lc30",
             "sessionId": "brqr7ipjpb3jqs7hnbcg",
-            "localPath": "C:%5C%20tmp%5CIMG_20200628_154144.jpg",
+            "localPath": "/files/C:%5C%20tmp%5CIMG_20200628_154144.jpg",
             "createdAt": {
                 "seconds": 1593333708,
                 "nanos": 600069300
@@ -137,7 +137,7 @@ Response example:
         {
             "id": "brqr7ipjpb3jqs7hnbcg:brs5ge1jpb3jmu66lc40",
             "sessionId": "brqr7ipjpb3jqs7hnbcg",
-            "localPath": "C:%5C%20tmp%5CIMG_20200628_154332.jpg",
+            "localPath": "/files/C:%5C%20tmp%5CIMG_20200628_154332.jpg",
             "createdAt": {
                 "seconds": 1593333816,
                 "nanos": 669570500
@@ -147,7 +147,7 @@ Response example:
         {
             "id": "brqr7ipjpb3jqs7hnbcg:brs5vrpjpb3gne1rbm0g",
             "sessionId": "brqr7ipjpb3jqs7hnbcg",
-            "localPath": "C:%5Ctmp%5CIMG_20200628_161627.jpg",
+            "localPath": "/files/C:%5Ctmp%5CIMG_20200628_161627.jpg",
             "createdAt": {
                 "seconds": 1593335791,
                 "nanos": 825199500
@@ -157,7 +157,7 @@ Response example:
         {
             "id": "brqr7ipjpb3jqs7hnbcg:brs5vshjpb3gne1rbm1g",
             "sessionId": "brqr7ipjpb3jqs7hnbcg",
-            "localPath": "C:%5Ctmp%5CVID_20200628_161633.mp4",
+            "localPath": "/files/C:%5Ctmp%5CVID_20200628_161633.mp4",
             "createdAt": {
                 "seconds": 1593335794,
                 "nanos": 677720800
@@ -166,7 +166,7 @@ Response example:
         {
             "id": "brqr7ipjpb3jqs7hnbcg:brs5vtpjpb3gne1rbm2g",
             "sessionId": "brqr7ipjpb3jqs7hnbcg",
-            "localPath": "C:%5Ctmp%5CVID_20200628_161637.mp4",
+            "localPath": "/files/C:%5Ctmp%5CVID_20200628_161637.mp4",
             "createdAt": {
                 "seconds": 1593335799,
                 "nanos": 874471000
@@ -176,7 +176,7 @@ Response example:
         {
             "id": "brqr7ipjpb3jqs7hnbcg:brs75bhjpb3gbh0tfrbg",
             "sessionId": "brqr7ipjpb3jqs7hnbcg",
-            "localPath": "C:%5Ctmp%5CIMG_20200628_173622.jpg",
+            "localPath": "/files/C:%5Ctmp%5CIMG_20200628_173622.jpg",
             "createdAt": {
                 "seconds": 1593340590,
                 "nanos": 291296300
